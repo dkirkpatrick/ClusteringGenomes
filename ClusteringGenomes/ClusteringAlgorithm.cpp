@@ -5,6 +5,7 @@
 
 #include "ClusteringAlgorithm.h"
 
+
 ClusteringAlgorithm::ClusteringAlgorithm(DistanceMetric * mDistanceMetric) : m_distanceMetric(mDistanceMetric) {}
 
 ModKMeans::ModKMeans(DistanceMetric* mDistanceMetric, int k, double percentChange, int maxIterations) : ClusteringAlgorithm(mDistanceMetric), m_k(k), m_percentChange(percentChange), m_maxIterations(maxIterations) {}
@@ -12,8 +13,8 @@ ModKMeans::ModKMeans(DistanceMetric* mDistanceMetric, int k, double percentChang
 
 std::vector<int> ModKMeans::getClusters(std::vector<std::vector<std::string>>& myRows) {
 	std::vector<int> myClusters = std::vector<int>(myRows.size(), 0);
-	//Assignment of centroids from first n  
-	//mCentroids is indicies into the array 
+	//Assignment of centroids from first n
+	//mCentroids is indicies into the array
 	std::vector<int> myCentroids = std::vector<int>(m_k, 0);
 	for (int i = 0; i < m_k; i++) {
 		myCentroids[i] = i;
@@ -33,8 +34,8 @@ std::vector<int> ModKMeans::getClusters(std::vector<std::vector<std::string>>& m
 	double changedCluster = 0.0;
 	int newCluster;
 	int clusterChange = 0;
-	int iterations = 0; 
-	//Loop for clustering assignments 
+	int iterations = 0;
+	//Loop for clustering assignments
 	while (changedCluster < m_percentChange && iterations < m_maxIterations) {
 		std::vector<double> clusterDistance = std::vector<double>(myRows.size(), 0.0);
 		for (int i = 0; i < myRows.size(); i++) {
@@ -67,7 +68,7 @@ std::vector<int> ModKMeans::getClusters(std::vector<std::vector<std::string>>& m
 			myClusters[i] = newCluster;
 		}
 		changedCluster = (double)clusterChange / (double)myRows.size();
-		iterations++; 
+		iterations++;
 	}
 	return myClusters;
 }

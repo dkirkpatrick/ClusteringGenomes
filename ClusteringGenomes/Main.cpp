@@ -8,75 +8,84 @@
 #include <sstream>
 #include <vector>
 #include <string>
+#include <map>
 
 #include "ClusteringAlgorithm.h"
 #include "DistanceMetric.h"
 #include "DBScan.h"
 
 
-std::vector<std::string> getNextRow(std::istream& str);  
+std::vector<std::string> getNextRow(std::istream& str);
 
 int main(int argv, char* argc[]) {
-	std::cout << "Hello World, this is " << argc[0] << std::endl; 
+  std::cout << "Hello World, this is " << argc[0] << std::endl;
+  std::string inputFile;
+  std::string outputFile;
+  // User provided input? If not, use defaults.
+  if (argv > 2) {
+    inputFile = argc[1];
+    outputFile = argc[2];
+  }
+  else {
+    inputFile = "data/snapshot__pop_1000.csv";
+    outputFile = "myClusters.csv";
+  }
 
-	std::string inputFile;
-	std::string outputFile;
+  std::ifstream ifile(inputFile);
+  std::vector<std::vector<std::string>> myPopulation = std::vector<std::vector<std::string>>();
 
-	//////////////CHANGE HERE//////////////
+  // Capture header information.
+  // {"attribute":index}
+  std::map<std::string, int> headerLookup;
+  if (!ifile.peek() != EOF) {
+    std::vector<std::string> header = getNextRow(ifile);
+    for (size_t i = 0; i < header.size(); i++) headerLookup[header[i]] = i;
+  } else {
+    std::cout << "This data file is totally empty, wtf?" << std::endl;
+    exit(-1);
+  }
+  std::cout << "Here's the data header map: " << std::endl;
+  for (auto key : headerLookup) {
+    std::cout << key.first << " : " << key.second << std::endl;
+  }
+  // Read in population.
+  while (ifile.peek() != EOF)
+  {
+    myPopulation.push_back(getNextRow(ifile));
+  }
 
+  // It's clusterin' time!
+  std::string outputSeparator = ",";
+  DistanceMetric* distMetric = new AvidaOrganismDistance(headerLookup);
+  exit(-1);
+  ClusteringAlgorithm* myAlgorithm = new DBScan(distMetric, 5, 10.0);
+  std::vector<int> myClusterAssignments = myAlgorithm->getClusters(myPopulation);
 
-	if (argv > 2) {
-		inputFile = argc[1];
-		outputFile = argc[2];
-	}
-	else {
-		inputFile = "myRows.csv"; 
-		outputFile = "myClusters.csv";
-	}
+  // Output results
+  std::ofstream ofile(outputFile);
+  for (int i = 0; i < myClusterAssignments.size(); i++) {
+    ofile << myClusterAssignments[i] << outputSeparator;
+  }
+  ofile << std::endl;
+  ofile.close();
 
-
-	std::string outputSeparator = ", "; 
-
-	DistanceMetric* myMetric = new EuclideanDistance(); 
-	ClusteringAlgorithm* myAlgorithm = new DBScan(myMetric, 5, 10.0); 
-
-
-	//////////////END CHANGE//////////////
-
-	std::ifstream ifile(inputFile);
-	std::vector<std::vector<std::string>> myPopulation = std::vector<std::vector<std::string>>();
-
-	while (ifile.peek() != EOF)
-	{
-		myPopulation.push_back(getNextRow(ifile)); 
-	}
-
-	std::vector<int> myClusterAssignments = myAlgorithm->getClusters(myPopulation);
-	
-	std::ofstream ofile(outputFile);
-	for (int i = 0; i < myClusterAssignments.size(); i++) {
-		ofile << myClusterAssignments[i] << outputSeparator; 
-	}
-	ofile << std::endl; 
-	ofile.close();
-
-	return 0; 
+  return 0;
 }
 
 std::vector<std::string> getNextRow(std::istream& str)
 {
-	std::vector<std::string> result;
-	std::string line;
-	std::getline(str, line);
+  std::vector<std::string> result;
+  std::string line;
+  std::getline(str, line);
 
 
-	std::stringstream lineStream(line);
-	std::string cell;
+  std::stringstream lineStream(line);
+  std::string cell;
 
 
-	while (std::getline(lineStream, cell, ','))
-	{
-		result.push_back(cell);
-	}
-	return result;
+  while (std::getline(lineStream, cell, ','))
+  {
+    result.push_back(cell);
+  }
+  return result;
 }

@@ -1,4 +1,0 @@
-﻿  Main.cpp
-c:\users\doug\documents\visual studio 2015\projects\clusteringgenomes\clusteringgenomes\main.cpp(57): warning C4018: '<': signed/unsigned mismatch
-  ClusteringGenomes.vcxproj -> C:\Users\Doug\Documents\Visual Studio 2015\Projects\ClusteringGenomes\Debug\ClusteringGenomes.exe
-  ClusteringGenomes.vcxproj -> C:\Users\Doug\Documents\Visual Studio 2015\Projects\ClusteringGenomes\Debug\ClusteringGenomes.pdb (Full PDB)

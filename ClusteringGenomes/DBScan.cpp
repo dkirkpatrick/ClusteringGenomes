@@ -4,13 +4,12 @@
 */
 
 #include "DBScan.h"
-#include <queue>
 
 DBScan::DBScan(DistanceMetric* mDistanceMetric, int minPts, double epsilon) : ClusteringAlgorithm(mDistanceMetric), m_minPts(minPts), m_epsilon(epsilon) {}
 
 
 std::vector<int> DBScan::getClusters(std::vector<std::vector<std::string>>& myRows) {
-	std::vector<int> myTypes = std::vector<int>(myRows.size(), 0); //-1 noise, 1 edge, 2 core 
+	std::vector<int> myTypes = std::vector<int>(myRows.size(), 0); //-1 noise, 1 edge, 2 core
 	std::vector<int> myClusters = std::vector<int>(myRows.size(), 0);
 	std::vector<int> numNeighbors = std::vector<int>(myRows.size(), 0);
 	std::vector<int> coreNeighbor = std::vector<int>(myRows.size(), 0);
@@ -20,8 +19,8 @@ std::vector<int> DBScan::getClusters(std::vector<std::vector<std::string>>& myRo
 	for (int i = 0; i < myRows.size(); i++) {
 		for (int j = i + 1; j < myRows.size(); j++) {
 			if (m_distanceMetric->getDistance(myRows[i], myRows[j]) < m_epsilon) {
-				numNeighbors[i]++; 
-				numNeighbors[j]++; 
+				numNeighbors[i]++;
+				numNeighbors[j]++;
 			}
 		}
 		if (numNeighbors[i] == 0) {
@@ -38,8 +37,8 @@ std::vector<int> DBScan::getClusters(std::vector<std::vector<std::string>>& myRo
 	//Final seperation of edge vs noise pts
 	for (int i = 0; i < myRows.size(); i++) {
 		if (myTypes[i] == 1) {
-			double minDistance = m_epsilon+1; 
-			int whichCorePt = -1; 
+			double minDistance = m_epsilon+1;
+			int whichCorePt = -1;
 			for (int j = 0; j < myRows.size(); j++) {
 				if (myTypes[j] == 2) {
 					double potentialDistance = m_distanceMetric->getDistance(myRows[i], myRows[j]);
@@ -50,9 +49,9 @@ std::vector<int> DBScan::getClusters(std::vector<std::vector<std::string>>& myRo
 				}
 			}
 			if (minDistance < m_epsilon) {
-				coreNeighbor[i] = whichCorePt; 
+				coreNeighbor[i] = whichCorePt;
 			} else {
-				myTypes[i] == -1; 
+				myTypes[i] == -1;
 			}
 		}
 	}
@@ -62,18 +61,18 @@ std::vector<int> DBScan::getClusters(std::vector<std::vector<std::string>>& myRo
 	std::vector<std::vector<int>> neighboringCorePts = std::vector<std::vector<int>>();
 	for (int i = 0; i < myRows.size(); i++) {
 		if(myTypes[i] == 2){
-			neighboringCorePts[i] = std::vector<int>(); 
+			neighboringCorePts[i] = std::vector<int>();
 			for (int j = i + 1; j < myRows.size(); j++) {
 				if (myTypes[j] == 2 && (m_distanceMetric->getDistance(myRows[i], myRows[j]) < m_epsilon)) {
-					neighboringCorePts[i].push_back(j); 
+					neighboringCorePts[i].push_back(j);
 				}
 			}
 		}
 	}
 
-	//Construct queues to use in cluster assignment 
+	//Construct queues to use in cluster assignment
 	std::queue<std::pair<int, int>> myAssignments = std::queue<std::pair<int, int>>();
-	std::queue<int> myCorePts = std::queue<int>(); 
+	std::queue<int> myCorePts = std::queue<int>();
 	for (int i = 0; i < myRows.size(); i++) {
 		if (myTypes[i] == 2) {
 			myCorePts.emplace(i);
@@ -83,25 +82,25 @@ std::vector<int> DBScan::getClusters(std::vector<std::vector<std::string>>& myRo
 		}
 	}
 
-	int clusterCounter = 2; 
+	int clusterCounter = 2;
 
 
 	//Assign core points to clusters
 	while (!myCorePts.empty()) {
 		//If all previous assignments made, start on next cluster
 		if (myAssignments.empty()) {
-			int potentialNext = myCorePts.front(); 
+			int potentialNext = myCorePts.front();
 			while (myClusters[potentialNext] > 0 && myCorePts.size() > 1) {
-				myCorePts.pop(); 
+				myCorePts.pop();
 				potentialNext = myCorePts.front();
 			}
 			if (myClusters[potentialNext] == 0) {
 				myAssignments.emplace(potentialNext, clusterCounter);
-				clusterCounter++; 
+				clusterCounter++;
 			}
 			myCorePts.pop();
-		} 
-		//If there assignments to be made, make them, and push new assignments 
+		}
+		//If there assignments to be made, make them, and push new assignments
 		if (!myAssignments.empty()) {
 			std::pair<int, int> temp = myAssignments.front();
 			if (myClusters[temp.first] == 0) {
@@ -112,7 +111,7 @@ std::vector<int> DBScan::getClusters(std::vector<std::vector<std::string>>& myRo
 						myAssignments.emplace(neighboringCorePts[temp.first][i], temp.second);
 					}
 				}
-			} 
+			}
 			myAssignments.pop();
 		}
 	}
@@ -121,7 +120,7 @@ std::vector<int> DBScan::getClusters(std::vector<std::vector<std::string>>& myRo
 	//Assign border points to closest core points
 	for (int i = 0; i < myRows.size(); i++) {
 		if (myTypes[i] == 1) {
-			myClusters[i] = myClusters[coreNeighbor[i]]; 
+			myClusters[i] = myClusters[coreNeighbor[i]];
 		}
 	}
 

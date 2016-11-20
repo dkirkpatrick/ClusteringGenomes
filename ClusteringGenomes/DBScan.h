@@ -6,8 +6,9 @@
 #ifndef DBSCAN_H_
 #define DBSCAN_H_
 
-#include <vector> 
-#include <algorithm> 
+#include <vector>
+#include <algorithm>
+#include <queue>
 #include "DistanceMetric.h"
 #include "ClusteringAlgorithm.h"
 
@@ -18,9 +19,9 @@ public:
 	std::vector<int> getClusters(std::vector<std::vector<std::string>>& myRows);
 
 private:
-	//Number of clusters k 
+	//Number of clusters k
 	int m_minPts;
-	//Percent of cluster assignments that need to stay the same to end loop  
+	//Percent of cluster assignments that need to stay the same to end loop
 	double m_epsilon;
 };
 
