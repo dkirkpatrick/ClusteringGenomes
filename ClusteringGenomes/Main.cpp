@@ -14,6 +14,8 @@
 #include "DistanceMetric.h"
 #include "DBScan.h"
 
+constexpr int MINPTS = 5;
+constexpr double EPSILON = 0.1;
 
 std::vector<std::string> getNextRow(std::istream& str);
 
@@ -37,16 +39,12 @@ int main(int argv, char* argc[]) {
   // Capture header information.
   // {"attribute":index}
   std::map<std::string, int> headerLookup;
-  if (!ifile.peek() != EOF) {
+  if (ifile.peek() != EOF) {
     std::vector<std::string> header = getNextRow(ifile);
     for (size_t i = 0; i < header.size(); i++) headerLookup[header[i]] = i;
   } else {
     std::cout << "This data file is totally empty, wtf?" << std::endl;
     exit(-1);
-  }
-  std::cout << "Here's the data header map: " << std::endl;
-  for (auto key : headerLookup) {
-    std::cout << key.first << " : " << key.second << std::endl;
   }
   // Read in population.
   while (ifile.peek() != EOF)
@@ -57,8 +55,7 @@ int main(int argv, char* argc[]) {
   // It's clusterin' time!
   std::string outputSeparator = ",";
   DistanceMetric* distMetric = new AvidaOrganismDistance(headerLookup);
-  exit(-1);
-  ClusteringAlgorithm* myAlgorithm = new DBScan(distMetric, 5, 10.0);
+  ClusteringAlgorithm* myAlgorithm = new DBScan(distMetric, MINPTS, EPSILON);
   std::vector<int> myClusterAssignments = myAlgorithm->getClusters(myPopulation);
 
   // Output results

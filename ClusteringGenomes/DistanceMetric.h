@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <iostream>
 #include <math.h>
+#include <cmath>
 #include <map>
 #include <string>
 #include <bitset>
@@ -63,7 +64,11 @@ public:
   };
 
   double editDistance(std::string& a, std::string& b) {
-    /* Given 2 strings: a & b, calculate edit distance between them. */
+    /*
+      Given 2 strings: a & b, calculate edit distance between them.
+      TODO: memoize
+    */
+
     // Create DP table:
     //  * 1 Row for null character + each symbol of a
     //  * 1 Column for null character + each symbol of b
@@ -98,12 +103,11 @@ public:
                     a and b should both be bit strings.
                     len(a) <= 8
                     len(b) <= 8
+      TODO: memoize
      */
     int m11 = 0, m01 = 0, m10 = 0, m00 = 0;
     std::bitset<8> aBits(a);
     std::bitset<8> bBits(b);
-    std::cout << "abits: " << aBits << std::endl;
-    std::cout << "bbits: " << bBits << std::endl;
     for (size_t i = 0; i < a.size(); i++) {
       if      (aBits[i] && bBits[i])   m11++;
       else if (aBits[i] && !bBits[i])  m10++;

@@ -26,7 +26,7 @@ double TaxicabDistance::getDistance(std::vector<std::string>& row1, std::vector<
 
 	double distance = 0.0;
 	for (int i = 0; i < row1.size(); i++) {
-		distance += abs(std::stod(row1[i]) - std::stod(row2[i]));
+		distance += std::abs(std::stod(row1[i]) - std::stod(row2[i]));
 	}
 
 	return distance;
@@ -60,9 +60,9 @@ double InfNormDistance::getDistance(std::vector<std::string>& row1, std::vector<
 		return 0.0;
 	}
 
-	double distance = abs(std::stod(row1[0]) - std::stod(row2[0]));
+	double distance = std::abs(std::stod(row1[0]) - std::stod(row2[0]));
 	for (int i = 1; i < row1.size(); i++) {
-		double temp = abs(std::stod(row1[i]) - std::stod(row2[i]));
+		double temp = std::abs(std::stod(row1[i]) - std::stod(row2[i]));
 		if (temp > distance) {
 			distance = temp;
 		}
