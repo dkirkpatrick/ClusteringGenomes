@@ -14,6 +14,7 @@
 #include <map>
 #include <string>
 #include <bitset>
+#include <tuple>
 
 
 class DistanceMetric {
@@ -45,6 +46,10 @@ public:
 class AvidaOrganismDistance : public DistanceMetric {
 public:
   std::map<std::string, int> rowAttributeLookup;
+
+  std::map<std::tuple<std::string, std::string>, double> editDistanceMemo;
+  std::map<std::tuple<std::string, std::string>, double> simpleMatchingCoeffMemo;
+
   AvidaOrganismDistance(std::map<std::string, int>& attributeLookup) :
     rowAttributeLookup(attributeLookup) { }
   double getDistance(std::vector<std::string>& row1, std::vector<std::string>& row2) {
@@ -66,34 +71,42 @@ public:
   double editDistance(std::string& a, std::string& b) {
     /*
       Given 2 strings: a & b, calculate edit distance between them.
-      TODO: memoize
     */
-
-    // Create DP table:
-    //  * 1 Row for null character + each symbol of a
-    //  * 1 Column for null character + each symbol of b
-    std::vector<std::vector<int>> table;
-    table.resize(a.size() + 1, std::vector<int>(b.size() + 1, 0));
-    // Fill out the base case.
-    for (size_t i = 0; i < table.size(); i++) {
-      table[i][0] = i;
-    }
-    for (size_t i = 0; i < table[0].size(); i++) {
-      table[0][i] = i;
-    }
-    // Fill out table row by row.
-    for (size_t r = 1; r < table.size(); r++) {
-      for (size_t c = 1; c < table[r].size(); c++) {
-        char achar = a[r - 1];
-        char bchar = b[c - 1];
-        if (achar == bchar) {
-          table[r][c] = table[r - 1][c - 1];
-        } else {
-          table[r][c] = std::min({table[r - 1][c - 1] + 1, table[r][c - 1] + 1, table[r - 1][c] + 1});
+    auto search = editDistanceMemo.find(std::make_tuple(a, b));
+    if (search != editDistanceMemo.end()) {
+      // Found (a, b)
+      return search->second;
+    } else {
+      // Haven't seen these inputs before. Do calculation and add to lookup table.
+      // Create DP table:
+      //  * 1 Row for null character + each symbol of a
+      //  * 1 Column for null character + each symbol of b
+      std::vector<std::vector<int>> table;
+      table.resize(a.size() + 1, std::vector<int>(b.size() + 1, 0));
+      // Fill out the base case.
+      for (size_t i = 0; i < table.size(); i++) {
+        table[i][0] = i;
+      }
+      for (size_t i = 0; i < table[0].size(); i++) {
+        table[0][i] = i;
+      }
+      // Fill out table row by row.
+      for (size_t r = 1; r < table.size(); r++) {
+        for (size_t c = 1; c < table[r].size(); c++) {
+          char achar = a[r - 1];
+          char bchar = b[c - 1];
+          if (achar == bchar) {
+            table[r][c] = table[r - 1][c - 1];
+          } else {
+            table[r][c] = std::min({table[r - 1][c - 1] + 1, table[r][c - 1] + 1, table[r - 1][c] + 1});
+          }
         }
       }
+      editDistanceMemo[std::make_tuple(a, b)] = table[table.size() - 1][table[0].size() - 1];
+      editDistanceMemo[std::make_tuple(b, a)] = table[table.size() - 1][table[0].size() - 1];
+      return table[table.size() - 1][table[0].size() - 1];
     }
-    return table[table.size() - 1][table[0].size() - 1];
+
   }
 
   double simpleMatchingCoeff(std::string& a, std::string& b) {
@@ -103,18 +116,26 @@ public:
                     a and b should both be bit strings.
                     len(a) <= 8
                     len(b) <= 8
-      TODO: memoize
      */
-    int m11 = 0, m01 = 0, m10 = 0, m00 = 0;
-    std::bitset<8> aBits(a);
-    std::bitset<8> bBits(b);
-    for (size_t i = 0; i < a.size(); i++) {
-      if      (aBits[i] && bBits[i])   m11++;
-      else if (aBits[i] && !bBits[i])  m10++;
-      else if (!aBits[i] && bBits[i])  m01++;
-      else if (!aBits[i] && !bBits[i]) m00++;
+     auto search = simpleMatchingCoeffMemo.find(std::make_tuple(a, b));
+     if (search != simpleMatchingCoeffMemo.end()) {
+       // Found (a, b)
+       return search->second;
+     } else {
+      int m11 = 0, m01 = 0, m10 = 0, m00 = 0;
+      std::bitset<8> aBits(a);
+      std::bitset<8> bBits(b);
+      for (size_t i = 0; i < a.size(); i++) {
+        if      (aBits[i] && bBits[i])   m11++;
+        else if (aBits[i] && !bBits[i])  m10++;
+        else if (!aBits[i] && bBits[i])  m01++;
+        else if (!aBits[i] && !bBits[i]) m00++;
+      }
+      double result = (double)(m11 + m00) / (double)(m11 + m01 + m10 + m00);
+      simpleMatchingCoeffMemo[std::make_tuple(a, b)] = result;
+      simpleMatchingCoeffMemo[std::make_tuple(b, a)] = result;
+      return result;
     }
-    return (double)(m11 + m00) / (double)(m11 + m01 + m10 + m00);
   }
 };
 
