@@ -25,13 +25,13 @@ std::vector<int> DBScan::getClusters(std::vector<std::vector<std::string>>& myRo
 			}
 		}
 		if (numNeighbors[i] == 0) {
-			myTypes[i] == -1;
+			myTypes[i] = -1;
 		}
 		else if (numNeighbors[i] > m_minPts) {
-			myTypes[i] == 2;
+			myTypes[i] = 2;
 
 		} else {
-			myTypes[i] == 1;
+			myTypes[i] = 1;
 		}
 	}
 
@@ -52,7 +52,7 @@ std::vector<int> DBScan::getClusters(std::vector<std::vector<std::string>>& myRo
 			if (minDistance < m_epsilon) {
 				coreNeighbor[i] = whichCorePt; 
 			} else {
-				myTypes[i] == -1; 
+				myTypes[i] = -1; 
 			}
 		}
 	}
