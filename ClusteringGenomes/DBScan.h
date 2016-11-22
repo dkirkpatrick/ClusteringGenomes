@@ -15,7 +15,7 @@ class DBScan : public ClusteringAlgorithm {
 public:
 
 	DBScan(DistanceMetric* mDistanceMetric, int minPts, double epsilon);
-	std::vector<int> getClusters(std::vector<std::vector<std::string>>& myRows);
+	std::vector<int> getClusters(std::vector<std::vector<std::string>>& myRows, std::vector<std::vector<double>>& myDistances);
 
 private:
 	//Number of clusters k 

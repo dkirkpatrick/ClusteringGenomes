@@ -10,7 +10,7 @@ ClusteringAlgorithm::ClusteringAlgorithm(DistanceMetric * mDistanceMetric) : m_d
 ModKMeans::ModKMeans(DistanceMetric* mDistanceMetric, int k, double percentChange, int maxIterations) : ClusteringAlgorithm(mDistanceMetric), m_k(k), m_percentChange(percentChange), m_maxIterations(maxIterations) {}
 
 
-std::vector<int> ModKMeans::getClusters(std::vector<std::vector<std::string>>& myRows) {
+std::vector<int> ModKMeans::getClusters(std::vector<std::vector<std::string>>& myRows, std::vector<std::vector<double>>& myDistances) {
 	std::vector<int> myClusters = std::vector<int>(myRows.size(), 0);
 	//Assignment of centroids from first n  
 	//mCentroids is indicies into the array 
@@ -20,10 +20,10 @@ std::vector<int> ModKMeans::getClusters(std::vector<std::vector<std::string>>& m
 		myClusters[i] = i;
 	}
 	for (int i = m_k; i < myRows.size(); i++) {
-		double distance = m_distanceMetric->getDistance(myRows[myCentroids[0]], myRows[i]);
+		double distance = myDistances[myCentroids[0]][i];
 		myClusters[i] = 0;
 		for (int j = 1; j < m_k; j++) {
-			double newDistance = m_distanceMetric->getDistance(myRows[myCentroids[j]], myRows[i]);
+			double newDistance = myDistances[myCentroids[j]][i];
 			if (newDistance < distance) {
 				distance = newDistance;
 				myClusters[i] = j;
@@ -40,7 +40,7 @@ std::vector<int> ModKMeans::getClusters(std::vector<std::vector<std::string>>& m
 		for (int i = 0; i < myRows.size(); i++) {
 			for (int j = i + 1; j < myRows.size(); j++) {
 				if (myClusters[i] == myClusters[j]) {
-					double distance = m_distanceMetric->getDistance(myRows[i], myRows[j]);
+					double distance = myDistances[i][j];
 					clusterDistance[i] += distance;
 					clusterDistance[j] += distance;
 				}
@@ -52,10 +52,10 @@ std::vector<int> ModKMeans::getClusters(std::vector<std::vector<std::string>>& m
 			}
 		}
 		for (int i = m_k; i < myRows.size(); i++) {
-			double distance = m_distanceMetric->getDistance(myRows[myCentroids[0]], myRows[i]);
+			double distance = myDistances[myCentroids[0]][i];
 			newCluster = 0;
 			for (int j = 1; j < m_k; j++) {
-				double newDistance = m_distanceMetric->getDistance(myRows[myCentroids[j]], myRows[i]);
+				double newDistance = myDistances[myCentroids[j]][i];
 				if (newDistance < distance) {
 					distance = newDistance;
 					newCluster = j;

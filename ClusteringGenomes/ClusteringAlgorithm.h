@@ -13,7 +13,7 @@
 class ClusteringAlgorithm {
 public:
 	ClusteringAlgorithm(DistanceMetric* mDistanceMetric); 
-	virtual std::vector<int> getClusters(std::vector<std::vector<std::string>>& myRows) = 0;
+	virtual std::vector<int> getClusters(std::vector<std::vector<std::string>>& myRows, std::vector<std::vector<double>>& myDistances) = 0;
 protected: 
 	DistanceMetric* m_distanceMetric; 
 };
@@ -22,7 +22,7 @@ class ModKMeans : public ClusteringAlgorithm {
 public:
 
 	ModKMeans(DistanceMetric* mDistanceMetric, int k, double percentChange, int maxIterations); 
-	std::vector<int> getClusters(std::vector<std::vector<std::string>>& myRows);
+	std::vector<int> getClusters(std::vector<std::vector<std::string>>& myRows, std::vector<std::vector<double>>& myDistances);
 
 private: 
 	//Number of clusters k 

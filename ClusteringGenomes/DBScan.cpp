@@ -9,7 +9,7 @@
 DBScan::DBScan(DistanceMetric* mDistanceMetric, int minPts, double epsilon) : ClusteringAlgorithm(mDistanceMetric), m_minPts(minPts), m_epsilon(epsilon) {}
 
 
-std::vector<int> DBScan::getClusters(std::vector<std::vector<std::string>>& myRows) {
+std::vector<int> DBScan::getClusters(std::vector<std::vector<std::string>>& myRows, std::vector<std::vector<double>>& myDistances) {
 	std::vector<int> myTypes = std::vector<int>(myRows.size(), 0); //-1 noise, 1 edge, 2 core 
 	std::vector<int> myClusters = std::vector<int>(myRows.size(), 0);
 	std::vector<int> numNeighbors = std::vector<int>(myRows.size(), 0);
@@ -19,7 +19,7 @@ std::vector<int> DBScan::getClusters(std::vector<std::vector<std::string>>& myRo
 	//Initial differentation of core, edge, noise points
 	for (int i = 0; i < myRows.size(); i++) {
 		for (int j = i + 1; j < myRows.size(); j++) {
-			if (m_distanceMetric->getDistance(myRows[i], myRows[j]) < m_epsilon) {
+			if (myDistances[i][j] < m_epsilon) {
 				numNeighbors[i]++; 
 				numNeighbors[j]++; 
 			}
@@ -27,7 +27,7 @@ std::vector<int> DBScan::getClusters(std::vector<std::vector<std::string>>& myRo
 		if (numNeighbors[i] == 0) {
 			myTypes[i] = -1;
 		}
-		else if (numNeighbors[i] > m_minPts) {
+		else if (numNeighbors[i] >= m_minPts) {
 			myTypes[i] = 2;
 
 		} else {
@@ -42,7 +42,7 @@ std::vector<int> DBScan::getClusters(std::vector<std::vector<std::string>>& myRo
 			int whichCorePt = -1; 
 			for (int j = 0; j < myRows.size(); j++) {
 				if (myTypes[j] == 2) {
-					double potentialDistance = m_distanceMetric->getDistance(myRows[i], myRows[j]);
+					double potentialDistance = myDistances[i][j];
 					if (potentialDistance < minDistance) {
 						minDistance = potentialDistance;
 						whichCorePt = j;
@@ -59,15 +59,16 @@ std::vector<int> DBScan::getClusters(std::vector<std::vector<std::string>>& myRo
 
 
 	//Find the neighboring core points of each core point
-	std::vector<std::vector<int>> neighboringCorePts = std::vector<std::vector<int>>();
+	std::vector<std::vector<int>> neighboringCorePts = std::vector<std::vector<int>>(myRows.size());
 	for (int i = 0; i < myRows.size(); i++) {
 		if(myTypes[i] == 2){
-			neighboringCorePts[i] = std::vector<int>(); 
+			std::vector<int> temp = std::vector<int>();
 			for (int j = i + 1; j < myRows.size(); j++) {
-				if (myTypes[j] == 2 && (m_distanceMetric->getDistance(myRows[i], myRows[j]) < m_epsilon)) {
-					neighboringCorePts[i].push_back(j); 
+				if (myTypes[j] == 2 && (myDistances[i][j] < m_epsilon)) {
+					temp.push_back(j); 
 				}
 			}
+			neighboringCorePts[i] = temp;
 		}
 	}
 
