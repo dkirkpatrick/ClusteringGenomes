@@ -15,7 +15,6 @@
 
 
 std::pair<std::string, std::vector<std::string>> getNextRow(std::istream& str);  
-void normalize(std::vector<std::vector<double>>& myDistances); 
 
 int main(int argv, char* argc[]) {
 	std::cout << "Hello World, this is " << argc[0] << std::endl; 
