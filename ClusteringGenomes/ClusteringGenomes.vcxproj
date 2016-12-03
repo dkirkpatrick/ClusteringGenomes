@@ -146,11 +146,13 @@
     <ClCompile Include="DistanceMetric.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ClusteringAlgorithm.cpp" />
+    <ClCompile Include="MBDistance.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClusteringAlgorithm.h" />
     <ClInclude Include="DBScan.h" />
     <ClInclude Include="DistanceMetric.h" />
+    <ClInclude Include="MBDistance.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

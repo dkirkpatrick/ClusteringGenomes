@@ -27,6 +27,9 @@
     <ClCompile Include="DBScan.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MBDistance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DistanceMetric.h">
@@ -36,6 +39,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DBScan.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MBDistance.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
